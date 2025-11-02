@@ -1,0 +1,24 @@
+# виртуальное окружение
+.venv/
+venv/
+env/
+ENV/
+
+# Python кэш
+__pycache__/
+*.py[cod]
+*$py.class
+
+# логи
+*.log
+
+# инсталяционные файлы
+*.egg-info/
+
+# SQLite база данных (если используется)
+*.sqlite3
+
+# файлы IDE
+.vscode/
+.idea/
+*.iml
