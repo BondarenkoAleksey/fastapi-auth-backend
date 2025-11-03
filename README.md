@@ -37,7 +37,7 @@ SECRET_KEY=your_secret_key_here
 5. Запустить сервер:
 
 ```bash
-uvicorn main:app --reload
+uvicorn main:app --host 127.0.0.1 --port 8080 --reload
 ```
 
 ---
@@ -54,7 +54,7 @@ uvicorn main:app --reload
 
 ## Технологии
 
-- Python 3.9+
+- Python 3.13
 - FastAPI
 - SQLAlchemy (async)
 - PostgreSQL

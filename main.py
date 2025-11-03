@@ -1,7 +1,6 @@
 from fastapi import FastAPI
+from src.routers import user
 
-app = FastAPI(title="Authentication Backend")
+app = FastAPI(title="User Authentication API")
 
-@app.get("/")
-async def root():
-    return {"message": "Hello, FastAPI authentication backend is running!"}
+app.include_router(user.router, prefix="/api")
