@@ -23,24 +23,35 @@ router = APIRouter()
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 def hash_password(password: str) -> str:
+    '''
+    Хэширование пароля
+    '''
     return pwd_context.hash(password)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    '''
+    Верификация пароля
+    '''
     return pwd_context.verify(plain_password, hashed_password)
 
-async def get_user_by_email(db: AsyncSession, email: str):
-    result = await db.execute(select(User).where(User.email == email))
-    return result.scalars().first()
-
 async def get_db():
+    '''
+    Создание сессии
+    '''
     async with AsyncSessionLocal() as session:
         yield session
 
 async def get_user_by_email(db: AsyncSession, email: str) -> Optional[User]:
+    '''
+    Возврат пользователя по email'у
+    '''
     result = await db.execute(select(User).where(User.email == email))
     return result.scalars().first()
 
 def create_access_token(data: dict, expires_delta: timedelta | None = None):
+    '''
+    Создание токена
+    '''
     to_encode = data.copy()
     expire = datetime.utcnow() + (expires_delta if expires_delta else timedelta(minutes=15))
     to_encode.update({"exp": expire})
@@ -50,6 +61,9 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
 
 @router.post("/register", response_model=UserRead)
 async def register_user(user_create: UserCreate, db: AsyncSession = Depends(get_db)):
+    '''
+    Регистрация нового пользователя
+    '''
     existing_user = await get_user_by_email(db, user_create.email)
     if existing_user:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
@@ -69,6 +83,9 @@ async def register_user(user_create: UserCreate, db: AsyncSession = Depends(get_
 
 @router.put("/user/{user_id}", response_model=UserRead)
 async def update_user(user_id: int, update_user: UpdateUser, db: AsyncSession = Depends(get_db)):
+    '''
+    Обновление данных пользователя
+    '''
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalars().first()
     if not user:
@@ -82,6 +99,9 @@ async def update_user(user_id: int, update_user: UpdateUser, db: AsyncSession = 
 
 @router.delete("/user/{user_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def delete_user(user_id: int, db: AsyncSession = Depends(get_db)):
+    '''
+    Деактивация пользователя (удаление)
+    '''
     result = await db.execute(select(User).where(User.id == user_id))
     user = result.scalars().first()
     if not user:
@@ -92,6 +112,9 @@ async def delete_user(user_id: int, db: AsyncSession = Depends(get_db)):
 
 @router.post("/login", response_model=Token)
 async def login(login_data: LoginData, db: AsyncSession = Depends(get_db)):
+    '''
+    Вход с получением JWT токена
+    '''
     user = await get_user_by_email(db, login_data.email)
     if not user or not verify_password(login_data.password, user.hashed_password):
         raise HTTPException(
@@ -108,4 +131,10 @@ async def login(login_data: LoginData, db: AsyncSession = Depends(get_db)):
 
 @router.post("/logout")
 async def logout():
+    '''
+    Выход
+    '''
     return {"message": "Logout successful"}
+
+
+
